@@ -855,7 +855,7 @@ bool AuthSocket::_HandleRealmList()
         bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && i->second.gamebuild == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(i->second.gamebuild));
 
         // No SQL injection. id of realm is controlled by the database.
-        uint32 flag = i->second.flag;
+        uint32 flag = i->second.color;
         RealmBuildInfo const* buildInfo = AuthHelper::GetBuildInfo(i->second.gamebuild);
         if (!okBuild)
         {
@@ -889,7 +889,7 @@ bool AuthSocket::_HandleRealmList()
         pkt << i->second.icon;                              // realm type
         if (_expversion & POST_BC_EXP_FLAG)                 // only 2.x and 3.x clients
             pkt << lock;                                    // if 1, then realm locked
-        pkt << uint8(flag);                                 // RealmFlags
+        pkt << i->second.color;                             // if 2, then realm is offline
         pkt << name;
         pkt << i->second.address;
         pkt << i->second.populationLevel;
@@ -900,13 +900,13 @@ bool AuthSocket::_HandleRealmList()
         else
             pkt << uint8(0x0);                              // 1.12.1 and 1.12.2 clients
 
-        if (_expversion & POST_BC_EXP_FLAG && flag & REALM_FLAG_SPECIFYBUILD)
+        /*if (_expversion & POST_BC_EXP_FLAG && flag & REALM_FLAG_SPECIFYBUILD)
         {
             pkt << uint8(buildInfo->MajorVersion);
             pkt << uint8(buildInfo->MinorVersion);
             pkt << uint8(buildInfo->BugfixVersion);
             pkt << uint16(buildInfo->Build);
-        }
+        }*/
 
         ++RealmListSize;
     }
